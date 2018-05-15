@@ -1,0 +1,5 @@
+rootProject.name = 'AWSTwitter'
+include ':aws-amplify-react-native'
+project(':aws-amplify-react-native').projectDir = new File(rootProject.projectDir, '../node_modules/aws-amplify-react-native/android')
+
+include ':app'
