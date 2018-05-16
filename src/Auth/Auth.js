@@ -7,8 +7,7 @@ import SignUp from './SignUp'
 import SignIn from './SignIn'
 import { colors } from 'AWSTwitter/src/theme'
 
-const logo = require('AWSTwitter/src/assets/logo.png')
-const signup = require('AWSTwitter/src/assets/signup.png')
+import { logo, signup } from 'AWSTwitter/src/assets/images'
 
 const Tabs = {
   SignIn: {
