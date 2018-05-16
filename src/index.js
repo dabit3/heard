@@ -7,7 +7,7 @@ import Auth from './Auth/Auth'
 import Heard from './Heard/Heard'
 
 const Nav = createSwitchNavigator({
-  // Initializing: { screen: Initializing },
+  Initializing: { screen: Initializing },
   Auth: { screen: Auth },
   Heard: { screen: Heard },
 })

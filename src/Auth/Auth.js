@@ -7,8 +7,6 @@ import SignUp from './SignUp'
 import SignIn from './SignIn'
 import { colors } from 'AWSTwitter/src/theme'
 
-console.log('colors: ', colors)
-
 const logo = require('AWSTwitter/src/assets/logo.png')
 const signup = require('AWSTwitter/src/assets/signup.png')
 
@@ -38,7 +36,7 @@ const Tabs = {
 }
 
 const config = {
-  initialRouteName: 'SignUp',
+  // initialRouteName: 'SignUp',
   tabBarOptions: {
     activeTintColor: colors.primary,
     style: {

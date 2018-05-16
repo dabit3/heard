@@ -49,6 +49,7 @@
 		E18FEF6A1E5B4DB8A30F7834 /* Roboto-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 21A9F03A6A57484685C047C8 /* Roboto-Regular.ttf */; };
 		3989E549779C4FDF9EEB156C /* Roboto-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5227EA3AD1EB4BD8970E5A38 /* Roboto-Thin.ttf */; };
 		F5728E3253D849E3AE636412 /* Roboto-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90038F70D3C1494D85878657 /* Roboto-ThinItalic.ttf */; };
+		65A058372FF44D818D214820 /* libRNAWSCognito.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C4EA4973E8A41F594D9836B /* libRNAWSCognito.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -366,6 +367,8 @@
 		21A9F03A6A57484685C047C8 /* Roboto-Regular.ttf */ = {isa = PBXFileReference; name = "Roboto-Regular.ttf"; path = "../src/assets/fonts/Roboto-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		5227EA3AD1EB4BD8970E5A38 /* Roboto-Thin.ttf */ = {isa = PBXFileReference; name = "Roboto-Thin.ttf"; path = "../src/assets/fonts/Roboto-Thin.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		90038F70D3C1494D85878657 /* Roboto-ThinItalic.ttf */ = {isa = PBXFileReference; name = "Roboto-ThinItalic.ttf"; path = "../src/assets/fonts/Roboto-ThinItalic.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		A336879DD5B741E7923E449E /* RNAWSCognito.xcodeproj */ = {isa = PBXFileReference; name = "RNAWSCognito.xcodeproj"; path = "../node_modules/amazon-cognito-identity-js/ios/RNAWSCognito.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		6C4EA4973E8A41F594D9836B /* libRNAWSCognito.a */ = {isa = PBXFileReference; name = "libRNAWSCognito.a"; path = "libRNAWSCognito.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -394,6 +397,7 @@
 				832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */,
 				00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */,
 				139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */,
+				65A058372FF44D818D214820 /* libRNAWSCognito.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -580,6 +584,7 @@
 				832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */,
 				00C302DF1ABCB9EE00DB3ED1 /* RCTVibration.xcodeproj */,
 				139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */,
+				A336879DD5B741E7923E449E /* RNAWSCognito.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1237,6 +1242,14 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AWSTwitter.app/AWSTwitter";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../node_modules/amazon-cognito-identity-js/ios/**",
+				);
 			};
 			name = Debug;
 		};
@@ -1254,6 +1267,14 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AWSTwitter.app/AWSTwitter";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../node_modules/amazon-cognito-identity-js/ios/**",
+				);
 			};
 			name = Release;
 		};
@@ -1272,6 +1293,10 @@
 				);
 				PRODUCT_NAME = AWSTwitter;
 				VERSIONING_SYSTEM = "apple-generic";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../node_modules/amazon-cognito-identity-js/ios/**",
+				);
 			};
 			name = Debug;
 		};
@@ -1289,6 +1314,10 @@
 				);
 				PRODUCT_NAME = AWSTwitter;
 				VERSIONING_SYSTEM = "apple-generic";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../node_modules/amazon-cognito-identity-js/ios/**",
+				);
 			};
 			name = Release;
 		};
@@ -1315,6 +1344,14 @@
 				SDKROOT = appletvos;
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 9.2;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../node_modules/amazon-cognito-identity-js/ios/**",
+				);
 			};
 			name = Debug;
 		};
@@ -1341,6 +1378,14 @@
 				SDKROOT = appletvos;
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 9.2;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../node_modules/amazon-cognito-identity-js/ios/**",
+				);
 			};
 			name = Release;
 		};
@@ -1366,6 +1411,14 @@
 				SDKROOT = appletvos;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AWSTwitter-tvOS.app/AWSTwitter-tvOS";
 				TVOS_DEPLOYMENT_TARGET = 10.1;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../node_modules/amazon-cognito-identity-js/ios/**",
+				);
 			};
 			name = Debug;
 		};
@@ -1391,6 +1444,14 @@
 				SDKROOT = appletvos;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AWSTwitter-tvOS.app/AWSTwitter-tvOS";
 				TVOS_DEPLOYMENT_TARGET = 10.1;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../node_modules/amazon-cognito-identity-js/ios/**",
+				);
 			};
 			name = Release;
 		};

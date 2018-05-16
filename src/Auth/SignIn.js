@@ -7,6 +7,7 @@ import {
   Platform,
   Image
 } from 'react-native'
+import { Auth } from 'aws-amplify'
 
 import { fonts } from 'AWSTwitter/src/theme'
 import { logo, logoTitle } from 'AWSTwitter/src/assets/images'
@@ -14,10 +15,44 @@ import Block from 'AWSTwitter/src/components/ColorBlock'
 import Button from 'AWSTwitter/src/components/BlueButton'
 
 export default class extends React.Component {
-  signIn = () => {
-    console.log('sign in pressed')
+  state = {
+    user: {},
+    username: '',
+    password: '',
+    authCode: '',
+    showConfirmSignIn: false
+  }
+  onChangeText = (key, value) => {
+    this.setState({
+      [key]: value
+    })
+  }
+  signIn = async () => {
+    const {
+      username, password
+    } = this.state
+    try {
+      const user = await Auth.signIn(username, password)
+      console.log('successfully signed in!')
+      this.setState({ user, showConfirmSignIn: true })
+    } catch (err) {
+      console.log('error signing in...', err)
+    }
+  }
+  confirmSignIn = async () => {
+    const {
+      user, authCode
+    } = this.state
+    try {
+       await Auth.confirmSignIn(user, authCode)
+       console.log('successful confirmsign in!')
+       this.props.navigation.navigate('Heard')
+    } catch (err) {
+      console.log('error confirming sign in: ', err)
+    }
   }
   render() {
+    const { showConfirmSignIn } =  this.state
     return (
       <View style={styles.container}>
         <Block style={{ transform: [{ rotate: '-45deg' }] }} />
@@ -32,16 +67,46 @@ export default class extends React.Component {
             resizeMode='contain'
           />
         </View>
-        <TextInput
-          placeholder='Username'
-          style={styles.input}
-        />
-        <TextInput
-          placeholder='Password'
-          secureTextEntry={true}
-          style={styles.input}
-        />
-        <Button title='Sign In' onPress={this.signIn} />
+        {
+          !showConfirmSignIn && (
+            <View>
+              <TextInput
+                onChangeText={val => this.onChangeText('username', val)}
+                placeholder='Username'
+                style={styles.input}
+                value={this.state.username}
+                autoCapitalize='none'
+                autoCorrect={false}
+              />
+              <TextInput
+                onChangeText={val => this.onChangeText('password', val)}
+                placeholder='Password'
+                style={styles.input}
+                value={this.state.password}
+                secureTextEntry
+                autoCapitalize='none'
+                autoCorrect={false}
+              />
+              <Button title='Sign In' onPress={this.signIn} />
+            </View>
+          )
+        }
+        {
+          showConfirmSignIn && (
+            <View>
+              <TextInput
+                onChangeText={val => this.onChangeText('authCode', val)}
+                placeholder='Authorization code'
+                style={styles.input}
+                value={this.state.authCode}
+                autoCapitalize='none'
+                autoCorrect={false}
+              />
+              <Button title='Sign In' onPress={this.confirmSignIn} />
+            </View>
+          )
+        }
+        
       </View>
     )
   }
