@@ -8,8 +8,10 @@ import {
 } from 'react-native'
 
 import { createBottomTabNavigator, createDrawerNavigator } from 'react-navigation'
+import { inject, observer } from 'mobx-react'
 
 import Drawer from 'AWSTwitter/src/components/DrawerNav'
+import Modal from 'AWSTwitter/src/components/TweetModal'
 import { search, home, create, logo } from 'AWSTwitter/src/assets/images'
 import { colors } from 'AWSTwitter/src/theme'
 import Search from './Search'
@@ -50,13 +52,15 @@ const Tabs = createBottomTabNavigator({
   }
 });
 
-
+@inject('uiStore')
+@observer
 class Home extends React.Component {
   static router = Tabs.router
   toggleDrawer = () => {
     this.props.navigation.openDrawer()
   }
   render() {
+    console.log('props:', this.props)
     return (
       <View style={styles.container}>
         <View style={styles.header}>
@@ -67,13 +71,16 @@ class Home extends React.Component {
           </TouchableWithoutFeedback>
           <View style={styles.headerRight}>
             <View style={styles.createIconContainer}>
-              <TouchableWithoutFeedback>
+              <TouchableWithoutFeedback
+                onPress={() => this.props.uiStore.toggleTweetModal()}
+              >
                 <Image source={create} style={styles.create} />
               </TouchableWithoutFeedback>
             </View>
           </View>
         </View>
         <Tabs navigation={this.props.navigation} />
+        <Modal />
       </View>
     )
   }
