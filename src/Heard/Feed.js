@@ -5,9 +5,13 @@ import {
   StyleSheet,
   ScrollView
 } from 'react-native'
+import { inject, observer } from 'mobx-react'
 
+@inject('userStore')
+@observer
 export default class Search extends React.Component {
   render() {
+    console.log('props from feed: ', this.props)
     return (
       <View>
         <Text>Hello from Feed</Text>

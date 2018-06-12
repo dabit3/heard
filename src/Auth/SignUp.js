@@ -12,7 +12,7 @@ import { Auth } from 'aws-amplify'
 
 import Block from 'AWSTwitter/src/components/ColorBlock'
 import Button from 'AWSTwitter/src/components/BlueButton'
-import { colors, fonts } from 'AWSTwitter/src/theme'
+import { fonts } from 'AWSTwitter/src/theme'
 
 import { logo, logoTitle } from 'AWSTwitter/src/assets/images'
 

@@ -60,7 +60,6 @@ class Home extends React.Component {
     this.props.navigation.openDrawer()
   }
   render() {
-    console.log('props:', this.props)
     return (
       <View style={styles.container}>
         <View style={styles.header}>
@@ -89,7 +88,7 @@ class Home extends React.Component {
 export default createDrawerNavigator({
   Home: { screen: Home }
 }, {
-  contentComponent: () => <Drawer />
+  contentComponent: props => <Drawer {...props} />
 })
 
 const styles = StyleSheet.create({
