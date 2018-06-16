@@ -14,41 +14,8 @@ import { fonts } from 'AWSTwitter/src/theme'
 import { logo, logoTitle } from 'AWSTwitter/src/assets/images'
 import Block from 'AWSTwitter/src/components/ColorBlock'
 import Button from 'AWSTwitter/src/components/BlueButton'
-
-const query = `
-  query getUser($userId: ID!) {
-    getUser(userId: $userId) {
-      username
-      userId
-      following {
-        items {
-          userId
-          username
-          tweets {
-            items {
-              tweetId
-              createdAt
-              tweetInfo {
-                text
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`
-
-const mutation = `
-  mutation createUser($userId: ID!, $username: String!) {
-    createUser(input: {
-      userId: $userId
-      username: $username
-    }) {
-      userId
-    }
-  }
-`
+import { getUserQuery } from 'AWSTwitter/src/graphql/queries'
+import { createUserMutation } from 'AWSTwitter/src/graphql/mutations'
 
 @inject('userStore')
 export default class extends React.Component {
@@ -83,22 +50,19 @@ export default class extends React.Component {
     try {
       // first try to sign in
       await Auth.confirmSignIn(user, authCode)
-      console.log('successful confirmsign in!')
       
       // once signed in, get current user information
       const currentUser = await Auth.currentAuthenticatedUser()
       const { signInUserSession: { accessToken: { payload: { sub, username }}}} = currentUser
-      console.log('currentUser: ', currentUser)
       
       // next, check to see if user exists in the database
-      let authenticatedUser = await API.graphql(graphqlOperation(query, { userId: sub }))
-      console.log('authenticatedUser: ', authenticatedUser)
+      let authenticatedUser = await API.graphql(graphqlOperation(getUserQuery, { userId: sub }))
       if (!authenticatedUser.data.getUser) {
-        const newUser = await API.graphql(graphqlOperation(mutation, { userId: sub, username }))
-        authenticatedUser = await API.graphql(graphqlOperation(query, { userId: sub }))
-        console.log('newUser: ', newUser)
-        console.log('authenticatedUser updated: ', authenticatedUser)
+        // if user does not exst, create a new user
+        await API.graphql(graphqlOperation(createUserMutation, { userId: sub, username }))
+        authenticatedUser = await API.graphql(graphqlOperation(getUserQuery, { userId: sub }))
       }
+
       this.props.userStore.updateUser(authenticatedUser.data.getUser)
       this.props.navigation.navigate('Heard')
     } catch (err) {
