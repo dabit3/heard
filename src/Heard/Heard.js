@@ -13,7 +13,7 @@ import { inject, observer } from 'mobx-react'
 import Drawer from 'AWSTwitter/src/components/DrawerNav'
 import Modal from 'AWSTwitter/src/components/TweetModal'
 import { search, home, create, logo, following } from 'AWSTwitter/src/assets/images'
-import { colors } from 'AWSTwitter/src/theme'
+import { colors, fonts } from 'AWSTwitter/src/theme'
 import Search from './Search'
 import Feed from './Feed'
 import Following from './Following'
@@ -55,7 +55,6 @@ const Tabs = createBottomTabNavigator({
 }, {
   tabBarOptions: {
     activeTintColor: colors.primary,
-    showLabel: false,
     style: {
       backgroundColor: 'white',
       borderTopColor: '#ededed',
@@ -81,6 +80,9 @@ class Home extends React.Component {
               <Image source={logo} style={styles.avatar} />
             </View>
           </TouchableWithoutFeedback>
+          <View style={{ justifyContent: 'center' }}>
+            <Text style={{ fontSize: 16, marginLeft: 30, fontFamily: fonts.medium }}>{this.props.navigation.state.routes[this.props.navigation.state.index].routeName}</Text>
+          </View>
           <View style={styles.headerRight}>
             <View style={styles.createIconContainer}>
               <TouchableWithoutFeedback

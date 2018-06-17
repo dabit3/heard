@@ -11,7 +11,6 @@ import { fonts } from 'AWSTwitter/src/theme'
 
 class Search extends React.Component {
   render() {
-    console.log('props from search: ', this.props)
     return (
         <ScrollView>
           <View>

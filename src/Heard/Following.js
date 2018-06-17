@@ -14,7 +14,6 @@ import { fonts } from 'AWSTwitter/src/theme'
 @observer
 class Following extends React.Component {
   render() {
-    console.log('props: ', this.props)
     return (
         <ScrollView>
           <View>

@@ -20,7 +20,7 @@ class Feed extends React.Component {
   render() {
     const { loading, tweets } = this.props
     return (
-      <ScrollView contentContainerStyle={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={loading && { flex: 1 }}>
         {
           loading && (
             <View style={styles.loader}>
