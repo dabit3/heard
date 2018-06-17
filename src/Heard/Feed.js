@@ -7,33 +7,22 @@ import {
   ActivityIndicator
 } from 'react-native'
 import { inject, observer } from 'mobx-react'
-import { Auth, API, graphqlOperation } from 'aws-amplify'
 import { getUserQuery } from 'AWSTwitter/src/graphql/queries'
 import uuidV4 from 'uuid/v4'
 import moment from 'moment'
+import { graphql, compose, withApollo } from 'react-apollo'
 
 import Tweet from 'AWSTwitter/src/components/Tweet'
 
 @inject('userStore')
 @observer
-export default class Search extends React.Component {
-  async componentDidMount() {
-    try {
-      const user = await Auth.currentAuthenticatedUser()
-      const { signInUserSession: { idToken: { payload: { sub }}}} = user
-      const userInfo = await API.graphql(graphqlOperation(getUserQuery, { userId: sub }))
-      this.props.userStore.updateUser(userInfo.data.getUser)
-      this.props.userStore.updateUserLoading(false)
-    } catch(err) {
-      console.log('error!: ', err)
-    }
-  }
+class Feed extends React.Component {
   render() {
-    const { tweets, loadingUser } = this.props.userStore
+    const { loading, tweets } = this.props
     return (
       <ScrollView contentContainerStyle={{ flex: 1 }}>
         {
-          loadingUser && (
+          loading && (
             <View style={styles.loader}>
               <ActivityIndicator />
             </View>
@@ -41,7 +30,7 @@ export default class Search extends React.Component {
         }
         <View>
           {
-            tweets.map((tweet, index) => (
+            !loading && tweets.map((tweet, index) => (
               <Tweet
                 text={tweet.tweetInfo.text}
                 author={tweet.author.username}
@@ -55,6 +44,39 @@ export default class Search extends React.Component {
     )
   }
 }
+
+export default compose(
+  withApollo,
+  graphql(
+    getUserQuery, {
+      options: data => ({
+        fetchPolicy: 'cache-and-network',
+        variables: { userId: data.screenProps.userId }
+      }),
+      props: props => {
+        const { loading, getUser } = props.data
+        let tweets = []
+        tweets = getUser.following.items.reduce((acc, next) => {
+          acc.push(...next.tweets.items)
+          return acc
+        }, [])
+        tweets.push(...getUser.tweets.items)
+        tweets.sort(function (a, b) {
+          var dateA = new Date(a.createdAt);
+          var dateB = new Date(b.createdAt);
+          return dateA - dateB;
+        })
+        .reverse()
+
+        return {
+          user: getUser,
+          loading,
+          tweets
+        }
+      }
+    }
+  )
+)(Feed)
 
 const styles = StyleSheet.create({
   container: {

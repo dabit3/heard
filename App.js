@@ -9,10 +9,7 @@ import {
 import Nav from './src'
 
 export default class extends Component {
-  state = {}
   render() {
-    return (
-      <Nav />
-    );
+    return <Nav />
   }
 }

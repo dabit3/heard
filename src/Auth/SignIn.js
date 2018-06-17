@@ -8,13 +8,13 @@ import {
   Image
 } from 'react-native'
 import { Auth, API, graphqlOperation } from 'aws-amplify'
-import { inject, observer } from 'mobx-react'
+import { inject } from 'mobx-react'
 
 import { fonts } from 'AWSTwitter/src/theme'
 import { logo, logoTitle } from 'AWSTwitter/src/assets/images'
 import Block from 'AWSTwitter/src/components/ColorBlock'
 import Button from 'AWSTwitter/src/components/BlueButton'
-import { getUserQuery } from 'AWSTwitter/src/graphql/queries'
+import { basicUserQuery } from 'AWSTwitter/src/graphql/queries'
 import { createUserMutation } from 'AWSTwitter/src/graphql/mutations'
 
 @inject('userStore')
@@ -56,11 +56,11 @@ export default class extends React.Component {
       const { signInUserSession: { accessToken: { payload: { sub, username }}}} = currentUser
       
       // next, check to see if user exists in the database
-      let authenticatedUser = await API.graphql(graphqlOperation(getUserQuery, { userId: sub }))
+      let authenticatedUser = await API.graphql(graphqlOperation(basicUserQuery, { userId: sub }))
       if (!authenticatedUser.data.getUser) {
         // if user does not exst, create a new user
         await API.graphql(graphqlOperation(createUserMutation, { userId: sub, username }))
-        authenticatedUser = await API.graphql(graphqlOperation(getUserQuery, { userId: sub }))
+        authenticatedUser = await API.graphql(graphqlOperation(basicUserQuery, { userId: sub }))
       }
 
       this.props.userStore.updateUser(authenticatedUser.data.getUser)

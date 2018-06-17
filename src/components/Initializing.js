@@ -8,21 +8,30 @@ import {
 } from 'react-native'
 
 import {
-  Auth
+  Auth, API, graphqlOperation
 } from 'aws-amplify'
+import { inject } from 'mobx-react'
+import { basicUserQuery } from 'AWSTwitter/src/graphql/queries'
 
 import { colors } from 'AWSTwitter/src/theme'
 import { logo } from 'AWSTwitter/src/assets/images'
 
+@inject('userStore')
 export default class extends React.Component {
   animatedValue = new Animated.Value(0)
   async componentDidMount() {
     this.animate()
     try {
-      const user = await Auth.currentAuthenticatedUser()
+      const currentUser = await Auth.currentAuthenticatedUser()
+      const { signInUserSession: { accessToken: { payload: { sub, username }}}} = currentUser
+      let authenticatedUser = await API.graphql(graphqlOperation(basicUserQuery, { userId: sub }))
+      this.props.userStore.updateUser(authenticatedUser.data.getUser)
+ 
       setTimeout(() => {
-        this.props.navigation.navigate('Heard')
-      }, 1000)
+        console.log('about to navigate!!')
+        console.log('authenticatedUser.data.getUser.userId: ', authenticatedUser.data.getUser.userId)
+        this.props.navigation.navigate('Heard', { userId: '12345' })
+      }, 350)
     } catch (err) {
       console.log('err:', err)
       this.props.navigation.navigate('Auth')

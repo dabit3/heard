@@ -12,10 +12,11 @@ import { inject, observer } from 'mobx-react'
 
 import Drawer from 'AWSTwitter/src/components/DrawerNav'
 import Modal from 'AWSTwitter/src/components/TweetModal'
-import { search, home, create, logo } from 'AWSTwitter/src/assets/images'
+import { search, home, create, logo, following } from 'AWSTwitter/src/assets/images'
 import { colors } from 'AWSTwitter/src/theme'
 import Search from './Search'
 import Feed from './Feed'
+import Following from './Following'
 
 const Tabs = createBottomTabNavigator({
   Feed: {
@@ -40,6 +41,17 @@ const Tabs = createBottomTabNavigator({
       )
     }
   },
+  Following: {
+    screen: Following,
+    navigationOptions: {
+      tabBarIcon: ({ tintColor }) => (
+        <Image
+          source={following}
+          style={[styles.icon, { tintColor }]}
+        />
+      )
+    }
+  },
 }, {
   tabBarOptions: {
     activeTintColor: colors.primary,
@@ -52,7 +64,7 @@ const Tabs = createBottomTabNavigator({
   }
 });
 
-@inject('uiStore')
+@inject('uiStore', 'userStore')
 @observer
 class Home extends React.Component {
   static router = Tabs.router
@@ -60,6 +72,7 @@ class Home extends React.Component {
     this.props.navigation.openDrawer()
   }
   render() {
+    const { user: { userId }} = this.props.userStore
     return (
       <View style={styles.container}>
         <View style={styles.header}>
@@ -78,7 +91,7 @@ class Home extends React.Component {
             </View>
           </View>
         </View>
-        <Tabs navigation={this.props.navigation} />
+        <Tabs navigation={this.props.navigation} screenProps={{ userId }} />
         <Modal />
       </View>
     )

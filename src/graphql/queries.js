@@ -1,4 +1,38 @@
-const getUserQuery = `
+import gql from 'graphql-tag'
+
+const basicUserQuery = `
+  query getUser($userId: ID!) {
+    getUser(userId: $userId) {
+      username
+      userId
+      tweets {
+        items {
+          author {
+            username
+          }
+          tweetId
+          createdAt
+          tweetInfo {
+            text
+          }
+        }
+      }
+    }
+  }
+`
+
+const listUsers = gql`
+  query listUsers {
+    listUsers {
+      items {
+        userId
+        username
+      }
+    }
+  }
+`
+
+const getUserQuery = gql`
   query getUser($userId: ID!) {
     getUser(userId: $userId) {
       username
@@ -38,5 +72,7 @@ const getUserQuery = `
 `
 
 export {
-  getUserQuery
+  basicUserQuery,
+  getUserQuery,
+  listUsers
 }

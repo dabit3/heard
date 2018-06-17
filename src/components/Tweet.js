@@ -22,6 +22,8 @@ class Tweet extends React.PureComponent {
   }
 }
 
+export default Tweet
+
 const styles = StyleSheet.create({
   container: {
     padding: 15,
@@ -45,5 +47,3 @@ const styles = StyleSheet.create({
     flexDirection: 'row'
   }
 })
-
-export default Tweet

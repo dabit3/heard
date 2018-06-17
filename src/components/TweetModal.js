@@ -1,7 +1,6 @@
 import React from 'react'
 import {
   View,
-  Text,
   StyleSheet,
   Modal,
   TouchableWithoutFeedback,
@@ -10,13 +9,17 @@ import {
 } from 'react-native'
 
 import { inject, observer } from 'mobx-react'
+import { createTweet } from 'AWSTwitter/src/graphql/mutations'
+import { getUserQuery } from 'AWSTwitter/src/graphql/queries'
+import { graphql, compose } from 'react-apollo'
+import TweetButton from 'AWSTwitter/src/components/TweetButton'
 
 import { close, logo } from 'AWSTwitter/src/assets/images'
 import { colors, fonts } from 'AWSTwitter/src/theme'
 
-@inject('uiStore')
+@inject('uiStore', 'userStore')
 @observer
-export default class TweetModal extends React.Component {
+class TweetModal extends React.Component {
   state = {
     tweetText: ''
   }
@@ -25,6 +28,18 @@ export default class TweetModal extends React.Component {
   }
   onChangeText = (tweetText) => {
     this.setState({ tweetText })
+  }
+  onAdd = () => {
+    if (!this.state.tweetText) return
+    const { userId } = this.props.userStore.user
+    const tweet = {
+      authorId: userId,
+      text: this.state.tweetText
+    }
+    this.props.onAdd(tweet)
+    this.setState({ tweetText: '' }, () => {
+      this.props.uiStore.toggleTweetModal()
+    })
   }
   render() {
     const { showTweetModal } = this.props.uiStore
@@ -43,6 +58,7 @@ export default class TweetModal extends React.Component {
                 style={styles.closeIcon}
               />
             </TouchableWithoutFeedback>
+            <TweetButton onPress={this.onAdd} />
           </View>
 
           <View style={styles.createTweetContainer}>
@@ -54,20 +70,60 @@ export default class TweetModal extends React.Component {
                 />
               </View>
             </View>
-            <View>
-              <TextInput
-                onChangeText={val => this.onChangeText(val)}
-                style={styles.input}
-                multiline={true}
-                placeholder="What's happening?"
-              />
-            </View>
+            <TextInput
+              onChangeText={val => this.onChangeText(val)}
+              style={styles.input}
+              multiline={true}
+              autoCorrect={false}
+              placeholder="What's happening?"
+            />
           </View>
         </View>
       </Modal>
     )
   }
 }
+
+export default compose(
+  graphql(createTweet, {
+    options: {
+      fetchPolicy: 'cache-and-network',
+    },
+    props: props => ({
+      onAdd: tweet  => {
+        props.mutate({
+          variables: tweet,
+          optimisticResponse: {
+            __typename: 'Mutation',
+            createTweet: {
+              __typename: 'Tweet',
+              authorId: tweet.authorId,
+              tweetInfo: {
+                __typename: 'TweetText',
+                text: tweet.text
+              }
+            }
+          },
+          update: (store, { data: { createTweet } }) => {
+            const data = store.readQuery({ query: getUserQuery, variables: { userId: tweet.authorId } })
+            const updatedTweet = {
+              ...createTweet,
+              author: {
+                username: data.getUser.username,
+                __typename: 'Author'
+              },
+              tweetId: null,
+              createdAt: new Date()
+            }
+
+            data.getUser.tweets.items.unshift(updatedTweet)
+            store.writeQuery({ query: getUserQuery, data, variables: { userId: tweet.authorId } })
+          },
+        })
+      }
+    }),
+  })
+)(TweetModal)
 
 const styles = StyleSheet.create({
   header: {
@@ -99,15 +155,18 @@ const styles = StyleSheet.create({
     backgroundColor: 'white'
   },
   createTweetContainer: {
+    flex: 1,
     padding: 20,
     paddingTop: 10,
     flexDirection: 'row'
   },
   input: {
     height: '100%',
-    width: '100%',
+    width: '90%',
     paddingTop: 10,
     fontSize: 16,
+    borderBottomColor: '#ddd',
+    borderBottomWidth: 1,
     fontFamily: fonts.regular
   }
 })
