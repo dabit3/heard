@@ -28,9 +28,7 @@ export default class extends React.Component {
       this.props.userStore.updateUser(authenticatedUser.data.getUser)
  
       setTimeout(() => {
-        console.log('about to navigate!!')
-        console.log('authenticatedUser.data.getUser.userId: ', authenticatedUser.data.getUser.userId)
-        this.props.navigation.navigate('Heard', { userId: '12345' })
+        this.props.navigation.navigate('Heard')
       }, 350)
     } catch (err) {
       console.log('err:', err)
