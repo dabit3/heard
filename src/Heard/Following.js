@@ -96,10 +96,11 @@ export default compose(
         variables: { userId: data.screenProps.userId }
       }),
       props: props => {
+        const { userId } = props.ownProps.screenProps
         const { getUser } = props.data
         let following = []
         if (getUser.following && getUser.following.items) {
-          following = getUser.following.items
+          following = getUser.following.items.filter(item => item.userId !== userId)
         }
         return {
           following

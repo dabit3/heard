@@ -97,9 +97,12 @@ export default compose(
     options: {
       fetchPolicy: 'cache-and-network',
     },
-    props: props => ({
-      users: props.data.listUsers ? props.data.listUsers.items : []
-    })
+    props: props => {
+      const { userId } = props.ownProps.screenProps
+      return {
+        users: props.data.listUsers ? props.data.listUsers.items.filter(item => item.userId !== userId) : []
+      }
+    }
   })
 )(Users)
 
