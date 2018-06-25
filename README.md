@@ -47,7 +47,9 @@ awsmobile push
 - Visit the [AWS AppSync](https://console.aws.amazon.com/appsync/home) console and create a new API.
 - In Settings, set the Auth mode to Amazon Cognito User Pool and choose the user pool created in the initial service creation.
 
-2. Create the following Schema:
+2. In index.js on line 11, change `<YOURAPPSYNCENDPOINT>` to the endpoint given to you when you created the AppSync API.
+
+3. Create the following Schema:
 
 ```graphql
 input CreateFollowingInput {
@@ -182,8 +184,6 @@ type User {
 	userId: ID!
 	username: String
 	tweets(limit: Int, nextToken: String): TweetConnection
-	# following(limit: Int, nextToken: String): UserFollowingConnection
-	####### following(limit: Int, nextToken: String): UserFollowingConnection
 	following(limit: Int, nextToken: String): UserFollowingConnection
 	followers(limit: Int, nextToken: String): UserFollowersConnection
 }
@@ -209,17 +209,156 @@ input UserInput {
 }
 ```
 
-3. Create the following DynamoDB Tables
+4. Create the following DynamoDB Tables
 
 - TweetTable
 - TwitterFollowingTable
 - TwitterUserTable
 
-3. Configure the following special resolvers:
+5. Create the following resolvers:
 
-User following(...): UserFollowingConnection: TwitterFollowingTable
+#### Query getUser(...): User: TwitterUserTable
 
 ```js
+// request mapping template
+{
+  "version": "2017-02-28",
+  "operation": "GetItem",
+  "key": {
+    "userId": $util.dynamodb.toDynamoDBJson($ctx.args.userId),
+  },
+}
+
+// response mapping template
+$util.toJson($context.result)
+```
+
+#### Query listUsers(...): ListUserConnection: TwitterUserTable
+
+```js
+// request mapping template
+{
+    "version" : "2017-02-28",
+    "operation" : "Scan",
+    "limit": $util.defaultIfNull(${ctx.args.limit}, 20),
+    "nextToken": $util.toJson($util.defaultIfNullOrBlank($ctx.args.nextToken, null))
+}
+
+// response mapping template
+$util.toJson($ctx.result.items)
+```
+
+#### Query listFollowing: [Following]: TwitterFollowingTable
+
+```js
+// request mapping template
+{
+    "version" : "2017-02-28",
+    "operation" : "Scan",
+}
+
+// response mapping template
+$util.toJson($ctx.result.items)
+```
+
+#### Mutation createFollowing(...): Following: TwitterFollowingTable
+
+```js
+// request mapping template
+{
+  "version": "2017-02-28",
+  "operation": "PutItem",
+  "key": {
+     ## If object "id" should come from GraphQL arguments, change to $util.dynamodb.toDynamoDBJson($ctx.args.id)
+    "id": $util.dynamodb.toDynamoDBJson($util.autoId()),
+  },
+  "attributeValues": $util.dynamodb.toMapValuesJson($ctx.args.input),
+  "condition": {
+    "expression": "attribute_not_exists(#id)",
+    "expressionNames": {
+      "#id": "id",
+    },
+  },
+}
+
+// response mapping template
+$util.toJson($context.result)
+```
+
+#### Mutation deleteFollowing(...): Following: TwitterFollowingTable
+
+```js
+// request mapping template
+{
+  "version": "2017-02-28",
+  "operation": "DeleteItem",
+  "key": {
+    "id": $util.dynamodb.toDynamoDBJson($ctx.args.input.id),
+  },
+}
+
+// response mapping template
+$util.toJson($context.result)
+```
+
+#### Mutation createUser(...): User: TwitterUserTable
+
+```js
+// request mapping template
+{
+  "version": "2017-02-28",
+  "operation": "PutItem",
+  "key": {
+    "userId": $util.dynamodb.toDynamoDBJson($ctx.args.input.userId),
+  },
+  "attributeValues": $util.dynamodb.toMapValuesJson($ctx.args.input),
+  "condition": {
+    "expression": "attribute_not_exists(#userId)",
+    "expressionNames": {
+      "#userId": "userId",
+    },
+  },
+}
+
+// response mapping template
+$util.toJson($context.result)
+```
+
+#### Mutation createTweet(...): Tweet: TweetTable
+
+```js
+// request mapping template
+#set($time = $util.time.nowISO8601())
+
+#set($attribs = $util.dynamodb.toMapValues($ctx.args.input))
+#set($attribs.createdAt = $util.dynamodb.toDynamoDB($time))
+#set($attribs.tweetId = $util.dynamodb.toDynamoDB($util.autoId()))
+
+{
+  "version": "2017-02-28",
+  "operation": "PutItem",
+  "key": {
+    "authorId": $util.dynamodb.toDynamoDBJson($ctx.args.input.authorId),
+    "createdAt": $util.dynamodb.toDynamoDBJson($time),
+  },
+  "attributeValues": $util.toJson($attribs),
+  "condition": {
+    "expression": "attribute_not_exists(#authorId) AND attribute_not_exists(#createdAt)",
+    "expressionNames": {
+      "#authorId": "authorId",
+      "#createdAt": "createdAt",
+    },
+  },
+}
+
+// response mapping template
+$util.toJson($context.result)
+```
+
+#### User following(...): UserFollowingConnection: TwitterFollowingTable
+
+```js
+// request mapping template
 {
     "version" : "2017-02-28",
     "operation" : "Query",
@@ -236,11 +375,17 @@ User following(...): UserFollowingConnection: TwitterFollowingTable
     ## "limit": $util.defaultIfNull(${ctx.args.first}, 20),
     ## "nextToken": $util.toJson($util.defaultIfNullOrBlank($ctx.args.after, null))
 }
+
+// response mapping template
+## Pass back the result from DynamoDB. **
+## $util.qr($util.error($ctx.result))
+$util.toJson($ctx.result)
 ```
 
-UserFollowingConnection items: [User]: TwitterUserTable
+#### UserFollowingConnection items: [User]: TwitterUserTable
 
 ```js
+// request mapping template
 ## UserFollowingConnection.items.request.vtl **
  
 #set($ids = [])
@@ -260,4 +405,15 @@ UserFollowingConnection items: [User]: TwitterUserTable
        }
     }
 }
+
+// response mapping template
+## Pass back the result from DynamoDB. **
+$util.toJson($ctx.result.data.TwitterUserTable)
+#if( ! ${ctx.result.data} )
+  $util.toJson($ctx.result.items)
+#else
+  $util.toJson($ctx.result.data.TwitterUserTable)
+#end
+
+## $util.toJson($ctx.result.data.TwitterUserTable)
 ```
