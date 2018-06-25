@@ -49,7 +49,7 @@ awsmobile push
 
 2. In index.js on line 11, change `<YOURAPPSYNCENDPOINT>` to the endpoint given to you when you created the AppSync API.
 
-3. Create the following Schema:
+3. Attach the following Schema:
 
 ```graphql
 input CreateFollowingInput {
