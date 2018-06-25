@@ -54,9 +54,9 @@ export default compose(
       }),
       props: props => {
         const { loading, getUser } = props.data
-
         let tweets = []
         tweets = getUser && getUser.following.items ? getUser.following.items.reduce((acc, next) => {
+          if (getUser.userId === next.userId) return acc
           if (!next) return acc
           acc.push(...next.tweets.items)
           return acc
