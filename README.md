@@ -221,7 +221,7 @@ input UserInput {
 - In TwitterFollowingTable, create a `followingId-index` with the `followingId` as the primary / partition key.
 - In TwitterFollowingTable, create a `followerId-index` with the `followerId` as the primary / partition key.
 
-__To create an index, click on the table you would like to create an index on, click on the `indexes` tab, then click _Create Index_ __
+__To create an index, click on the table you would like to create an index on, click on the `indexes` tab, then click _Create Index_ .__
 
 6. Create the following resolvers:
 
