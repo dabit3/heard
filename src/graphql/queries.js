@@ -21,6 +21,16 @@ const basicUserQuery = `
   }
 `
 
+const listFollowingQuery = gql`
+  query listFollowing {
+    listFollowing {
+      id
+      followingId
+      followerId
+    }
+  }
+`
+
 const listUsers = gql`
   query listUsers {
     listUsers {
@@ -51,6 +61,7 @@ const getUserQuery = gql`
       }
       following {
         items {
+          
           userId
           username
           tweets {
@@ -74,5 +85,6 @@ const getUserQuery = gql`
 export {
   basicUserQuery,
   getUserQuery,
-  listUsers
+  listUsers,
+  listFollowingQuery
 }

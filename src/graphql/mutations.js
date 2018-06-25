@@ -27,7 +27,31 @@ const createTweet = gql`
   }
 `
 
+const deleteFollowing = gql`
+  mutation deleteFollowing($id: ID!) {
+    deleteFollowing(input: {
+      id: $id
+    }) {
+      id
+      followingId
+    }
+  }
+`
+
+const createFollowing = gql`
+  mutation createFollowing($followerId: ID!, $followingId: ID!) {
+    createFollowing(input: {
+      followerId: $followerId
+      followingId: $followingId
+    }) {
+      id
+    }
+  }
+`
+
 export {
   createUserMutation,
-  createTweet
+  createTweet,
+  deleteFollowing,
+  createFollowing
 }

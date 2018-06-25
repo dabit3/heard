@@ -46,7 +46,6 @@ class Feed extends React.Component {
 }
 
 export default compose(
-  withApollo,
   graphql(
     getUserQuery, {
       options: data => ({
@@ -55,12 +54,16 @@ export default compose(
       }),
       props: props => {
         const { loading, getUser } = props.data
+
         let tweets = []
-        tweets = getUser.following.items.reduce((acc, next) => {
+        tweets = getUser && getUser.following.items ? getUser.following.items.reduce((acc, next) => {
+          if (!next) return acc
           acc.push(...next.tweets.items)
           return acc
-        }, [])
-        tweets.push(...getUser.tweets.items)
+        }, []) : []
+        if (getUser) {
+          tweets.push(...getUser.tweets.items)
+        }
         tweets.sort(function (a, b) {
           var dateA = new Date(a.createdAt);
           var dateB = new Date(b.createdAt);

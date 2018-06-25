@@ -7,7 +7,7 @@ import SignUp from './SignUp'
 import SignIn from './SignIn'
 import { colors } from 'AWSTwitter/src/theme'
 
-import { logo, signup } from 'AWSTwitter/src/assets/images'
+import { logo, signUp } from 'AWSTwitter/src/assets/images'
 
 const Tabs = {
   SignIn: {
@@ -26,7 +26,7 @@ const Tabs = {
     navigationOptions: () => ({
       tabBarIcon: ({ tintColor }) => (
         <Image
-          source={signup}
+          source={signUp}
           style={{ width: 28, height: 28, tintColor }}
         />
       )

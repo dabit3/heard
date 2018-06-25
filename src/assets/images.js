@@ -7,6 +7,7 @@ const avatar = require('./images/avatar.png')
 const create = require('./images/create.png')
 const close = require('./images/close.png')
 const following = require('./images/following.png')
+const users = require('./images/users.png')
 
 export {
   logo,
@@ -17,5 +18,6 @@ export {
   avatar,
   create,
   close,
-  following
+  following,
+  users
 }

@@ -12,9 +12,9 @@ import { inject, observer } from 'mobx-react'
 
 import Drawer from 'AWSTwitter/src/components/DrawerNav'
 import Modal from 'AWSTwitter/src/components/TweetModal'
-import { search, home, create, logo, following } from 'AWSTwitter/src/assets/images'
+import { users, home, create, logo, following } from 'AWSTwitter/src/assets/images'
 import { colors, fonts } from 'AWSTwitter/src/theme'
-import Search from './Search'
+import Users from './Users'
 import Feed from './Feed'
 import Following from './Following'
 
@@ -30,12 +30,12 @@ const Tabs = createBottomTabNavigator({
       )
     }
   },
-  Search: {
-    screen: Search,
+  Users: {
+    screen: Users,
     navigationOptions: {
       tabBarIcon: ({ tintColor }) => (
         <Image
-          source={search}
+          source={users}
           style={[styles.icon, { tintColor }]}
         />
       )
