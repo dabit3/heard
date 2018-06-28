@@ -34,6 +34,7 @@ export default class DrawerNav extends React.Component {
               </View>
             </TouchableOpacity>
           </View>
+          <Text style={styles.username}>hello, {this.props.userStore.user.username}</Text>
         </View>
       )
     } 
@@ -56,9 +57,14 @@ const styles = StyleSheet.create({
     marginRight: 12
   },
   title: {
-    fontFamily: fonts.primary,
+    fontFamily: fonts.normal,
     fontSize: 18,
     color: 'rgba(0, 0, 0, .8)',
     marginTop: 1
+  },
+  username: {
+    fontFamily: fonts.medium,
+    marginTop: 10,
+    fontSize: 17
   }
 })
