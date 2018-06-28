@@ -78,9 +78,15 @@ export default compose(
       }
     })
   }),
+  graphql(getUserQuery, {
+    options: data => ({
+      fetchPolicy: 'cach-and-network',
+      variables: { userId: data.screenProps.userId },
+    }),
+  }),
   graphql(listFollowingQuery, {
     options: {
-      fetchPolicy: 'cache-and-network',
+      fetchPolicy: 'cach-and-network',
     },
     props: props => {
       const followingMap = props.data.listFollowing ? props.data.listFollowing.reduce((acc, next) => {

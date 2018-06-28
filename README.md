@@ -1,8 +1,15 @@
-# Enterprise React Native Twitter Clone
+# Heard - An enterprise React Native Social Messaging App
 
 ### Built with AWS AppSync & AWS Amplify
 
 ![](https://imgur.com/Kqmdwdy.jpg)
+
+### Todo
+
+- [ ] Add subscriptions for real time updates / messages in feed
+- [ ] Update resolvers to also pull in follower data to reduce the amount of client side code + logic needed to identify follower / following information
+- [ ] Add user profile section
+- [ ] Add "follower" tab
 
 # Getting Started
 
@@ -58,11 +65,11 @@ input CreateFollowingInput {
 	followingId: ID!
 }
 
-input CreateTweetInput {
-	tweetId: ID
+input CreateMessageInput {
+	messageId: ID
 	authorId: ID!
 	createdAt: String
-	tweetInfo: TweetInfoInput!
+	messageInfo: MessageInfoInput!
 	author: UserInput
 }
 
@@ -75,7 +82,7 @@ input DeleteFollowingInput {
 	id: ID!
 }
 
-input DeleteTweetInput {
+input DeleteMessageInput {
 	authorId: ID!
 	createdAt: String!
 }
@@ -101,9 +108,9 @@ type ListUserConnection {
 }
 
 type Mutation {
-	createTweet(input: CreateTweetInput!): Tweet
-	updateTweet(input: UpdateTweetInput!): Tweet
-	deleteTweet(input: DeleteTweetInput!): Tweet
+	createMessage(input: CreateMessageInput!): Message
+	updateMessage(input: UpdateMessageInput!): Message
+	deleteMessage(input: DeleteMessageInput!): Message
 	createUser(input: CreateUserInput!): User
 	updateUser(input: UpdateUserInput!): User
 	deleteUser(input: DeleteUserInput!): User
@@ -113,21 +120,21 @@ type Mutation {
 }
 
 type Query {
-	getTweet(authorId: ID!, createdAt: String!): Tweet
-	listTweets(first: Int, after: String): TweetConnection
+	getMessage(authorId: ID!, createdAt: String!): Message
+	listMessages(first: Int, after: String): MessageConnection
 	listFollowing: [Following]
 	getUser(userId: ID!): User
 	listUsers(first: Int, after: String): ListUserConnection
-	queryTweetsByAuthorIdIndex(authorId: ID!, first: Int, after: String): TweetConnection
+	queryMessagesByAuthorIdIndex(authorId: ID!, first: Int, after: String): MessageConnection
 }
 
 type Subscription {
-	onCreateTweet(tweetId: ID, authorId: ID, createdAt: String): Tweet
-		@aws_subscribe(mutations: ["createTweet"])
-	onUpdateTweet(tweetId: ID, authorId: ID, createdAt: String): Tweet
-		@aws_subscribe(mutations: ["updateTweet"])
-	onDeleteTweet(tweetId: ID, authorId: ID, createdAt: String): Tweet
-		@aws_subscribe(mutations: ["deleteTweet"])
+	onCreateMessage(messageId: ID, authorId: ID, createdAt: String): Message
+		@aws_subscribe(mutations: ["createMessage"])
+	onUpdateMessage(messageId: ID, authorId: ID, createdAt: String): Message
+		@aws_subscribe(mutations: ["updateMessage"])
+	onDeleteMessage(messageId: ID, authorId: ID, createdAt: String): Message
+		@aws_subscribe(mutations: ["deleteMessage"])
 	onCreateUser(userId: ID, username: String): User
 		@aws_subscribe(mutations: ["createUser"])
 	onUpdateUser(userId: ID, username: String): User
@@ -142,24 +149,24 @@ type Subscription {
 		@aws_subscribe(mutations: ["deleteFollowing"])
 }
 
-type Tweet {
-	tweetId: ID!
+type Message {
+	messageId: ID!
 	authorId: ID!
-	tweetInfo: TweetInfo!
+	messageInfo: MessageInfo!
 	author: User
 	createdAt: String
 }
 
-type TweetConnection {
-	items: [Tweet]
+type MessageConnection {
+	items: [Message]
 	nextToken: String
 }
 
-type TweetInfo {
+type MessageInfo {
 	text: String!
 }
 
-input TweetInfoInput {
+input MessageInfoInput {
 	text: String!
 }
 
@@ -169,8 +176,8 @@ input UpdateFollowingInput {
 	followingId: ID
 }
 
-input UpdateTweetInput {
-	tweetId: ID
+input UpdateMessageInput {
+	messageId: ID
 	authorId: ID!
 	createdAt: String!
 }
@@ -183,7 +190,7 @@ input UpdateUserInput {
 type User {
 	userId: ID!
 	username: String
-	tweets(limit: Int, nextToken: String): TweetConnection
+	messages(limit: Int, nextToken: String): MessageConnection
 	following(limit: Int, nextToken: String): UserFollowingConnection
 	followers(limit: Int, nextToken: String): UserFollowersConnection
 }
@@ -211,21 +218,50 @@ input UserInput {
 
 4. Create the following DynamoDB Tables
 
-- TweetTable
-- TwitterFollowingTable
-- TwitterUserTable
+- HeardMessageTable
+- HeardFollowingTable
+- HeardUserTable
 
 5. Add the following indexes:
 
-- In TweetTable, create an `authorId-index` with the `authorId` as the primary / partition key.
-- In TwitterFollowingTable, create a `followingId-index` with the `followingId` as the primary / partition key.
-- In TwitterFollowingTable, create a `followerId-index` with the `followerId` as the primary / partition key.
+- In HeardMessageTable, create an `authorId-index` with the `authorId` as the primary / partition key.
+- In HeardFollowingTable, create a `followingId-index` with the `followingId` as the primary / partition key.
+- In HeardFollowingTable, create a `followerId-index` with the `followerId` as the primary / partition key.
 
 __To create an index, click on the table you would like to create an index on, click on the `indexes` tab, then click _Create Index_ .__
 
 6. Create the following resolvers:
 
-#### Query getUser(...): User: TwitterUserTable
+#### Message author: User: HeardUserTable
+
+```js
+// request mapping template
+{
+    "version": "2017-02-28",
+    "operation": "GetItem",
+    "key": {
+        "userId": $util.dynamodb.toDynamoDBJson($ctx.source.authorId),
+    }
+}
+
+// response mapping template
+$util.toJson($ctx.result)
+```
+
+#### ListUserConnection items: [User]: HeardUserTable
+
+```js
+// request mapping template
+{
+    "version" : "2017-02-28",
+    "operation" : "Scan",
+}
+
+// response mapping template
+$util.toJson($ctx.result.items)
+```
+
+#### Query getUser(...): User: HeardUserTable
 
 ```js
 // request mapping template
@@ -241,7 +277,7 @@ __To create an index, click on the table you would like to create an index on, c
 $util.toJson($context.result)
 ```
 
-#### Query listUsers(...): ListUserConnection: TwitterUserTable
+#### Query listUsers(...): ListUserConnection: HeardUserTable
 
 ```js
 // request mapping template
@@ -256,20 +292,56 @@ $util.toJson($context.result)
 $util.toJson($ctx.result.items)
 ```
 
-#### Query listFollowing: [Following]: TwitterFollowingTable
+#### Query listFollowing: [Following]: HeardFollowingTable
 
 ```js
 // request mapping template
 {
     "version" : "2017-02-28",
-    "operation" : "Scan",
+    "operation" : "Query",
+    "index" : "followerId-index",
+    "query" : {
+        "expression": "followerId = :id",
+        "expressionValues" : {
+            ":id" : {
+                "S" : "${ctx.identity.sub}"
+            }
+        }
+    }
 }
 
 // response mapping template
 $util.toJson($ctx.result.items)
 ```
 
-#### Mutation createFollowing(...): Following: TwitterFollowingTable
+#### Query queryMessagesByAuthorIdIndex(...): MessageConnection: HeardMessageTable
+
+```js
+// request mapping template
+{
+  "version": "2017-02-28",
+  "operation": "Query",
+  "query": {
+    "expression": "#authorId = :authorId",
+    "expressionNames": {
+      "#authorId": "authorId",
+    },
+    "expressionValues": {
+      ":authorId": $util.dynamodb.toDynamoDBJson($ctx.args.authorId),
+    },
+  },
+  "index": "authorId-index",
+  "limit": $util.defaultIfNull($ctx.args.first, 20),
+  "nextToken": $util.toJson($util.defaultIfNullOrEmpty($ctx.args.after, null)),
+  "scanIndexForward": true,
+  "select": "ALL_ATTRIBUTES",
+}
+
+// response mapping template
+$util.toJson($context.result)
+```
+
+#### Mutation createFollowing(...): Following: HeardFollowingTable
 
 ```js
 // request mapping template
@@ -293,7 +365,7 @@ $util.toJson($ctx.result.items)
 $util.toJson($context.result)
 ```
 
-#### Mutation deleteFollowing(...): Following: TwitterFollowingTable
+#### Mutation deleteFollowing(...): Following: HeardFollowingTable
 
 ```js
 // request mapping template
@@ -309,7 +381,7 @@ $util.toJson($context.result)
 $util.toJson($context.result)
 ```
 
-#### Mutation createUser(...): User: TwitterUserTable
+#### Mutation createUser(...): User: HeardUserTable
 
 ```js
 // request mapping template
@@ -332,7 +404,7 @@ $util.toJson($context.result)
 $util.toJson($context.result)
 ```
 
-#### Mutation createTweet(...): Tweet: TweetTable
+#### Mutation createMessage(...): Message: HeardMessageTable
 
 ```js
 // request mapping template
@@ -340,7 +412,7 @@ $util.toJson($context.result)
 
 #set($attribs = $util.dynamodb.toMapValues($ctx.args.input))
 #set($attribs.createdAt = $util.dynamodb.toDynamoDB($time))
-#set($attribs.tweetId = $util.dynamodb.toDynamoDB($util.autoId()))
+#set($attribs.messageId = $util.dynamodb.toDynamoDB($util.autoId()))
 
 {
   "version": "2017-02-28",
@@ -363,7 +435,31 @@ $util.toJson($context.result)
 $util.toJson($context.result)
 ```
 
-#### User following(...): UserFollowingConnection: TwitterFollowingTable
+#### User messages(...): MessageConnection: HeardMessageTable
+
+```js
+// request mapping template
+{
+    "version" : "2017-02-28",
+    "operation" : "Query",
+    "index" : "authorId-index",
+    "query" : {
+        "expression": "authorId = :id",
+        "expressionValues" : {
+            ":id" : {
+                "S" : "${ctx.source.userId}"
+            }
+        }
+    },
+    "limit": $util.defaultIfNull(${ctx.args.first}, 20),
+    "nextToken": $util.toJson($util.defaultIfNullOrBlank($ctx.args.after, null))
+}
+
+// response mapping template
+$util.toJson($ctx.result)
+```
+
+#### User following(...): UserFollowingConnection: HeardFollowingTable
 
 ```js
 // request mapping template
@@ -390,7 +486,7 @@ $util.toJson($context.result)
 $util.toJson($ctx.result)
 ```
 
-#### UserFollowingConnection items: [User]: TwitterUserTable
+#### UserFollowingConnection items: [User]: HeardUserTable
 
 ```js
 // request mapping template
@@ -407,7 +503,7 @@ $util.toJson($ctx.result)
     "version" : "2018-05-29",
     "operation" : "BatchGetItem",
     "tables" : {
-        "TwitterUserTable": {
+        "HeardUserTable": {
            "keys": $util.toJson($ids),
            "consistentRead": true
        }
@@ -416,12 +512,11 @@ $util.toJson($ctx.result)
 
 // response mapping template
 ## Pass back the result from DynamoDB. **
-$util.toJson($ctx.result.data.TwitterUserTable)
 #if( ! ${ctx.result.data} )
-  $util.toJson($ctx.result.items)
+  $util.toJson([])
 #else
-  $util.toJson($ctx.result.data.TwitterUserTable)
+  $util.toJson($ctx.result.data.HeardUserTable)
 #end
 
-## $util.toJson($ctx.result.data.TwitterUserTable)
+## $util.toJson($ctx.result.data.HeardUserTable)
 ```

@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { createSwitchNavigator } from 'react-navigation'
 
 import Initializing from './components/Initializing'

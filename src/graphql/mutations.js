@@ -11,16 +11,16 @@ const createUserMutation = `
   }
 `
 
-const createTweet = gql`
-  mutation createTweet($text: String!, $authorId: ID!) {
-    createTweet(input:{
-      tweetInfo: {
+const createMessage = gql`
+  mutation createMessage($text: String!, $authorId: ID!) {
+    createMessage(input:{
+      messageInfo: {
         text:  $text
       }
       authorId: $authorId
     }) {
       authorId
-      tweetInfo {
+      messageInfo {
         text
       }
     }
@@ -51,7 +51,7 @@ const createFollowing = gql`
 
 export {
   createUserMutation,
-  createTweet,
+  createMessage,
   deleteFollowing,
   createFollowing
 }

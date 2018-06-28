@@ -5,14 +5,14 @@ const basicUserQuery = `
     getUser(userId: $userId) {
       username
       userId
-      tweets {
+      messages {
         items {
           author {
             username
           }
-          tweetId
+          messageId
           createdAt
-          tweetInfo {
+          messageInfo {
             text
           }
         }
@@ -47,14 +47,14 @@ const getUserQuery = gql`
     getUser(userId: $userId) {
       username
       userId
-      tweets {
+      messages {
         items {
           author {
             username
           }
-          tweetId
+          messageId
           createdAt
-          tweetInfo {
+          messageInfo {
             text
           }
         }
@@ -64,14 +64,14 @@ const getUserQuery = gql`
           
           userId
           username
-          tweets {
+          messages {
             items {
               author {
                 username
               }
-              tweetId
+              messageId
               createdAt
-              tweetInfo {
+              messageInfo {
                 text
               }
             }

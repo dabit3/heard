@@ -18,7 +18,7 @@ import Tweet from 'AWSTwitter/src/components/Tweet'
 @observer
 class Feed extends React.Component {
   render() {
-    const { loading, tweets } = this.props
+    const { loading, messages } = this.props
     return (
       <ScrollView contentContainerStyle={loading && { flex: 1 }}>
         {
@@ -30,11 +30,11 @@ class Feed extends React.Component {
         }
         <View>
           {
-            !loading && tweets.map((tweet, index) => (
+            !loading && messages.map((message, index) => (
               <Tweet
-                text={tweet.tweetInfo.text}
-                author={tweet.author.username}
-                createdAt={moment(tweet.createdAt).format('MMMM Do YYYY, h:mm:ss a')}
+                text={message.messageInfo.text}
+                author={message.author.username}
+                createdAt={moment(message.createdAt).format('MMMM Do YYYY, h:mm:ss a')}
                 key={uuidV4()}
               />
             ))
@@ -54,17 +54,17 @@ export default compose(
       }),
       props: props => {
         const { loading, getUser } = props.data
-        let tweets = []
-        tweets = getUser && getUser.following.items ? getUser.following.items.reduce((acc, next) => {
-          if (getUser.userId === next.userId) return acc
+        let messages = []
+        messages = getUser && getUser.following.items ? getUser.following.items.reduce((acc, next) => {
           if (!next) return acc
-          acc.push(...next.tweets.items)
+          if (getUser.userId === next.userId) return acc
+          acc.push(...next.messages.items)
           return acc
         }, []) : []
         if (getUser) {
-          tweets.push(...getUser.tweets.items)
+          messages.push(...getUser.messages.items)
         }
-        tweets.sort(function (a, b) {
+        messages.sort(function (a, b) {
           var dateA = new Date(a.createdAt);
           var dateB = new Date(b.createdAt);
           return dateA - dateB;
@@ -74,7 +74,7 @@ export default compose(
         return {
           user: getUser,
           loading,
-          tweets
+          messages
         }
       }
     }

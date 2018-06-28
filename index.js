@@ -8,7 +8,7 @@ import config from './src/aws-exports'
 import { ApolloProvider } from 'react-apollo'
 
 const client = new AWSAppSyncClient({
-  url: '<YOURAPPSYNCENDPOINT>',
+  url: 'https://dp7aen2zanczzmilqjhoucvmjy.appsync-api.us-east-1.amazonaws.com/graphql',
   region: 'us-east-1',
   auth: {
     type: 'AMAZON_COGNITO_USER_POOLS',

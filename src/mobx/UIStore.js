@@ -1,10 +1,10 @@
 import { observable, action } from 'mobx'
 
 class UIStore {
-  @observable showTweetModal = false
+  @observable showMessageModal = false
 
-  @action toggleTweetModal() {
-    this.showTweetModal = !this.showTweetModal
+  @action toggleMessageModal() {
+    this.showMessageModal = !this.showMessageModal
   }
 }
 

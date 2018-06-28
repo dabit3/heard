@@ -11,7 +11,7 @@ import { createBottomTabNavigator, createDrawerNavigator } from 'react-navigatio
 import { inject, observer } from 'mobx-react'
 
 import Drawer from 'AWSTwitter/src/components/DrawerNav'
-import Modal from 'AWSTwitter/src/components/TweetModal'
+import Modal from 'AWSTwitter/src/components/MessageModal'
 import { users, home, create, logo, following } from 'AWSTwitter/src/assets/images'
 import { colors, fonts } from 'AWSTwitter/src/theme'
 import Users from './Users'
@@ -72,6 +72,8 @@ class Home extends React.Component {
   }
   render() {
     const { user: { userId }} = this.props.userStore
+    const { showMessageModal } = this.props.uiStore
+
     return (
       <View style={styles.container}>
         <View style={styles.header}>
@@ -86,7 +88,7 @@ class Home extends React.Component {
           <View style={styles.headerRight}>
             <View style={styles.createIconContainer}>
               <TouchableWithoutFeedback
-                onPress={() => this.props.uiStore.toggleTweetModal()}
+                onPress={() => this.props.uiStore.toggleMessageModal()}
               >
                 <Image source={create} style={styles.create} />
               </TouchableWithoutFeedback>
@@ -94,7 +96,9 @@ class Home extends React.Component {
           </View>
         </View>
         <Tabs navigation={this.props.navigation} screenProps={{ userId }} />
-        <Modal />
+        {
+          showMessageModal && <Modal />
+        }
       </View>
     )
   }
