@@ -7,7 +7,6 @@
 ### Todo
 
 - [ ] Add subscriptions for real time updates / messages in feed
-- [ ] Update resolvers to also pull in follower data to reduce the amount of client side code + logic needed to identify follower / following information
 - [ ] Add user profile section
 - [ ] Add "follower" tab
 
