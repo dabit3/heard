@@ -6,6 +6,7 @@
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest"
   },
+  "license": "MIT",
   "dependencies": {
     "aws-amplify": "^0.3.3",
     "aws-amplify-react-native": "^0.2.9",
